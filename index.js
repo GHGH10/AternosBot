@@ -39,15 +39,13 @@ function createBot() {
          console.log(`[Auth] Sent /register command.`);
 
          bot.once('chat', (username, message) => {
-            console.log(`[ChatLog] <${username}> ${message}`); // Log all chat messages
-
-            // Check for various possible responses
+            console.log(`[ChatLog] <${username}> ${message}`);
             if (message.includes('successfully registered')) {
                console.log('[INFO] Registration confirmed.');
                resolve();
             } else if (message.includes('already registered')) {
                console.log('[INFO] Bot was already registered.');
-               resolve(); // Resolve if already registered
+               resolve();
             } else if (message.includes('Invalid command')) {
                reject(`Registration failed: Invalid command. Message: "${message}"`);
             } else {
@@ -63,8 +61,7 @@ function createBot() {
          console.log(`[Auth] Sent /login command.`);
 
          bot.once('chat', (username, message) => {
-            console.log(`[ChatLog] <${username}> ${message}`); // Log all chat messages
-
+            console.log(`[ChatLog] <${username}> ${message}`);
             if (message.includes('successfully logged in')) {
                console.log('[INFO] Login successful.');
                resolve();
@@ -84,9 +81,7 @@ function createBot() {
 
       if (config.utils['auto-auth'].enabled) {
          console.log('[INFO] Started auto-auth module');
-
          const password = config.utils['auto-auth'].password;
-
          pendingPromise = pendingPromise
             .then(() => sendRegister(password))
             .then(() => sendLogin(password))
@@ -100,15 +95,9 @@ function createBot() {
          if (config.utils['chat-messages'].repeat) {
             const delay = config.utils['chat-messages']['repeat-delay'];
             let i = 0;
-
-            let msg_timer = setInterval(() => {
+            setInterval(() => {
                bot.chat(`${messages[i]}`);
-
-               if (i + 1 === messages.length) {
-                  i = 0;
-               } else {
-                  i++;
-               }
+               i = (i + 1) % messages.length;
             }, delay * 1000);
          } else {
             messages.forEach((msg) => {
@@ -118,20 +107,25 @@ function createBot() {
       }
 
       const pos = config.position;
-
       if (config.position.enabled) {
          console.log(
-            `\x1b[32m[Afk Bot] Starting to move to target location (${pos.x}, ${pos.y}, ${pos.z})\x1b[0m`
+            `\x1b[32m[Afk Bot] Moving to target location (${pos.x}, ${pos.y}, ${pos.z})\x1b[0m`
          );
          bot.pathfinder.setMovements(defaultMove);
          bot.pathfinder.setGoal(new GoalBlock(pos.x, pos.y, pos.z));
       }
 
+      // Anti-AFK & Sürekli Zıplama
       if (config.utils['anti-afk'].enabled) {
-         bot.setControlState('jump', true);
          if (config.utils['anti-afk'].sneak) {
             bot.setControlState('sneak', true);
          }
+         setInterval(() => {
+            bot.setControlState('jump', true);
+            setTimeout(() => {
+               bot.setControlState('jump', false);
+            }, 500); // yarım saniye zıplama
+         }, 3000); // her 3 saniyede bir zıpla
       }
    });
 
