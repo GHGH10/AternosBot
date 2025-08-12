@@ -1,13 +1,13 @@
 {
   "bot-account": {
-    "username": "AFKBot", 
-    "password": "",
+    "username": "GHNetwork", 
+    "password": "gold.magmanode.com",
     "type": "mojang"
   },
 
   "server": {
-    "ip": "ghnetwork.aternos.me", 
-    "port": 64655,   
+    "ip": "", 
+    "port": 33747,   
     "version": "1.12.1"   
   },
   
